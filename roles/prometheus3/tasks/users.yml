@@ -1,0 +1,39 @@
+---
+- name: Enabling ssh connection via passwd
+  lineinfile: 
+    path: /etc/ssh/sshd_config
+    regexp: '^PasswordAuthentication'
+    line: 'PasswordAuthentication yes'
+  notify: reload-ssh
+
+- name: Creating home directory
+  file:
+    path: /opt/home
+    state: directory
+    mode: 0775
+
+- name: Add users
+  user:
+    name=ansusr
+    shell=/bin/bash
+    password=$1$Xtabo4mB$wXZMWm0Yl4VxSUnOxXI.Z.
+    home=/opt/home
+    
+- name: Authorized keys
+  authorized_key:
+    user: ansusr
+    state: present
+    key: "{{ lookup('file', 'ansusr.pub') }}"
+
+- name: Add ansusr to sudoers 
+  lineinfile: 
+    path: /etc/sudoers
+    line: 'ansusr ALL=(ALL) NOPASSWD:ALL'
+
+- name: Creating vagrant files directory
+  file:
+    path: /home/vagrant/files
+    state: directory
+    owner: vagrant
+    group: vagrant
+    mode: 0775

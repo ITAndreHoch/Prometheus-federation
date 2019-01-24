@@ -1,0 +1,172 @@
+---
+# tasks file for mysql1
+- name: Update system
+  yum:
+    name: '*'
+    state:  latest
+
+- name: Add MySql  repository
+  yum_repository:
+    name: mysql
+    description: Mysql repository
+    baseurl: http://repo.mysql.com/yum/mysql-5.7-community/el/7/$basearch/ 
+    gpgcheck: no
+    enabled: yes
+
+- name: Add Prometheus repositpory
+  yum_repository:
+    name: Prometheus
+    description: Prometheus repository
+    baseurl: https://packagecloud.io/prometheus-rpm/release/el/7/$basearch/
+    file: prometheus
+    gpgkey:
+      - https://packagecloud.io/prometheus-rpm/release/gpgkey
+      - https://raw.githubusercontent.com/lest/prometheus-rpm/master/RPM-GPG-KEY-prometheus-rpm
+    gpgcheck: yes
+    enabled: yes
+  notify: yum-clean-metadata
+ 
+- name: Installation Node_exporter
+  yum: 
+    name: 
+      - node_exporter
+    state: present 
+
+- name: Installation mysql and MySQL-python 
+  yum: 
+    name: 
+      - mysql
+      - MySQL-python
+      - mysql-community-server
+    state: present 
+
+- name: Starting services like node_exporter
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  with_items:
+    - 'node_exporter'
+
+
+- name: Starting service MYSQL
+  systemd:
+    name: "{{ item }}"
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
+  with_items:
+    - 'mysqld'
+
+- name: capture password from mysql log
+  command: /bin/bash -c "grep 'temporary password' /var/log/mysqld.log |  awk '{print $NF}'"
+  register: login
+- debug: 
+    msg: "haslo to  {{ login.stdout }}"
+
+
+- name: Set new password for user Root
+  shell: 'mysql -e "SET PASSWORD = PASSWORD(''{{ mysql_root_password }}'');" --connect-expired-password -uroot -p"{{ login.stdout }}"'
+  register: message
+  failed_when: message.rc != 1 and message.rc != 0
+  args:
+    warn: false
+
+
+- name: Copy sql.sh  file
+  copy:
+    src: query.sh
+    dest: /home/vagrant/query.sh
+    owner: vagrant
+    group: vagrant
+    mode: 0755
+
+
+- name: Copy query.sql file
+  copy:
+    src: query.sql
+    dest: /home/vagrant/query.sql
+    owner: vagrant
+    group: vagrant
+    mode: 0755
+
+
+- name: Copy table.sql file
+  copy:
+    src: table.sql
+    dest: /home/vagrant/table.sql
+    owner: vagrant
+    group: vagrant
+    mode: 0755
+
+
+- name: Creating database and tables
+  shell: 'mysql -uroot -pAdmin2018! < /home/vagrant/table.sql'
+  register: message
+  failed_when: message.rc != 1 and message.rc != 0
+  args:
+    warn: false
+
+
+- name: Creating entry for mysql query
+  cron:
+    name: "mysql query"
+    minute: "*/2"
+    hour: "*"
+    job: "/home/vagrant/query.sh 2>&1"
+
+### MySQL Exporter
+
+- name: Installation mysqld_exporter
+  yum:
+    name:
+      - mysqld_exporter
+    state: present
+
+- name: Enable service mysqld_exporter
+  systemd:
+    name: mysqld_exporter
+    enabled: yes
+    daemon_reload: yes
+
+- name: Copy systemd service file for mysqld_exporter
+  copy:
+    src: ./files/mysqld_exporter.service
+    dest: /usr/lib/systemd/system/mysqld_exporter.service
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Enable service mysqld_exporter
+  systemd:
+    name: mysqld_exporter
+    state: started
+    enabled: yes
+    daemon_reload: yes
+
+- name: Creating home directory
+  file:
+    path: /opt/home
+    state: directory
+    mode: 0775
+
+- name: Add users
+  user:
+    name=ansusr
+    shell=/bin/bash
+    password=$1$O1UOx6Th$pinf44XNpi59CTiuzCuMv1
+    home=/opt/home
+    
+- name: Add ansusr to sudoers 
+  lineinfile: 
+    path: /etc/sudoers
+    line: 'ansusr ALL=(ALL) NOPASSWD:ALL'
+
+- name: Creating vagrant files directory
+  file:
+    path: /home/vagrant/files
+    state: directory
+    owner: vagrant
+    group: vagrant
+    mode: 0775

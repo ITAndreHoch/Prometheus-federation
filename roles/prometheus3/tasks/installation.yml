@@ -1,0 +1,61 @@
+---
+- name: Update system
+  yum:
+    name: '*'
+    state:  latest
+
+- name: Installation multiple packages
+  yum:
+    name: net-tools
+    state: present
+
+- name: Add Prometheus repositpory
+  yum_repository:
+    name: Prometheus
+    description: Prometheus repository
+    baseurl: https://packagecloud.io/prometheus-rpm/release/el/7/$basearch/
+    file: prometheus
+    gpgkey:
+     - https://packagecloud.io/prometheus-rpm/release/gpgkey
+     - https://raw.githubusercontent.com/lest/prometheus-rpm/master/RPM-GPG-KEY-prometheus-rpm
+    gpgcheck: yes
+    enabled: yes
+
+- name: Add Grafana repository
+  yum_repository:
+    name: grafana
+    description: Grafana repository
+    baseurl: https://packagecloud.io/grafana/stable/el/7/$basearch
+    file: grafana
+    gpgkey: https://packagecloud.io/gpg.key https://grafanarel.s3.amazonaws.com/RPM-GPG-KEY-grafana
+    gpgcheck: yes
+    enabled: yes
+    sslcacert: /etc/pki/tls/certs/ca-bundle.crt
+  notify: yum-clean-metadata
+
+- name: Installation Prometheus, Grafana
+  yum: 
+    name: 
+      - prometheus
+      - grafana
+    state: present 
+
+- name: Inserting cofiguration for prometheus
+  copy:
+    src: prometheus.yml
+    dest: "/etc/prometheus/prometheus.yml"
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
+       
+- name: Starting services Prometheus, grafana
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  with_items:
+    - 'prometheus'
+    - 'grafana-server'
+  notify: reload-grafana

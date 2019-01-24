@@ -1,0 +1,26 @@
+global:
+  scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  external_labels:
+      monitor: 'codelab-monitor'
+      datacenter: global
+
+rule_files:
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: datacenter_federation
+    scrape_interval: 15s
+    honor_labels: true
+    metrics_path: /federate
+    params:
+      'match[]':
+        - '{job="mysql_exporter"}'
+        - '{__name__=~"^job:.*"}'
+    static_configs:
+      - targets: 
+        - 192.168.50.21:9090 
+        - 192.168.50.23:9090

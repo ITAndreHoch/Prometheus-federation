@@ -1,0 +1,9 @@
+---
+# handlers file for mysql1
+- name: yum-clean-metadata
+  command: yum clean metadata
+  args:
+    warn: no
+
+- name: reload-ssh
+  service: name=sshd state=restarted

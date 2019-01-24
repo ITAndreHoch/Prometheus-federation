@@ -1,0 +1,10 @@
+---
+- hosts: prometheus1
+  remote_user: vagrant
+  become: true
+  become_method: sudo
+  become_user: root
+
+
+  roles:
+    - prometheus1

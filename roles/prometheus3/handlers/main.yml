@@ -1,0 +1,10 @@
+---
+# handlers file for prometheus-env
+- name: yum-clean-metadata
+  command: yum clean metadata
+  args:
+    warn: no
+- name: reload-ssh
+  service: name=sshd state=restarted
+- name: reload-grafana
+  service: name=grafana-server state=restarted
