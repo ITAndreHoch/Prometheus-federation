@@ -5,9 +5,38 @@
 - Showing the possibility of Prometheus in the *Hierarchical Federation* configuration
 
 ***
+
+**Prerequisites:**
+
+You must have installed:
+
+1. Virtual Box
+2. Vagrant tool made by *Hashi Corp*
+
+* Vagrant is a tool for building and managing virtual machine environments in a single workflow. With an easy-to-use workflow and focus on automation, Vagrant lowers development environment setup time, increases production parity, and makes the "works on my machine" excuse a relic of the past. https://www.vagrantup.com/
+* VirtualBox is a powerful x86 and AMD64/Intel64 virtualization product for enterprise as well as home use. https://www.virtualbox.org/
+
+
+
+
+***
 **Instalation:**
 
 
+1. mkdir /*your_path*/prometheus; cd /*your_path*/prometheus 
+2. git init
+3. git clone https://github.com/ITAndreHoch/Prometheus-federation.git
+4. cd Prometheus-federation
+5. vagrant up 
+
+
+All components will automatically deploy like: servers, os, application, and configuration.
+Important: Configuration of Grafana - DATASOURCES, DASHBORD will be also implemented.
+
+Connection to individual servers: vagrant ssh "name of machine" eg. prometheus1
+
+check status:
+vagrant status
 
 ***
 **Target configuration:**
