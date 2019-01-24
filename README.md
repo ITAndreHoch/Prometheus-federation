@@ -35,13 +35,12 @@ Access to Grafana WEB GUI:
 |----------|----------|------|
 | admin    | admin    | 3000 |
 
+Access to individual servers: vagrant ssh "name of machine" eg. *vagrant ss prometheus1 ; sudo su -*
+
+check status: *vagrant status*
+
 All components will automatically deploy like: servers, os, application, and configuration.
 Important: Configuration of Grafana - DATASOURCES, DASHBORD will be also implemented.
-
-Connection to individual servers: vagrant ssh "name of machine" eg. prometheus1
-
-check status:
-vagrant status
 
 ***
 **Target configuration:**
