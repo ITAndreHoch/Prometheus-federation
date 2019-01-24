@@ -29,6 +29,16 @@ You must have installed:
 4. cd Prometheus-federation
 5. vagrant up 
 
+Access to Grafana WEB GUI:
+
+| Username | Password | Port |
+|----------|----------|------|
+| admin    | admin    | 3000 |
+
+
+
+
+user: admin, password: admin. After first login you need to change password
 
 All components will automatically deploy like: servers, os, application, and configuration.
 Important: Configuration of Grafana - DATASOURCES, DASHBORD will be also implemented.
