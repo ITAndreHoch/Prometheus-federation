@@ -35,11 +35,6 @@ Access to Grafana WEB GUI:
 |----------|----------|------|
 | admin    | admin    | 3000 |
 
-
-
-
-user: admin, password: admin. After first login you need to change password
-
 All components will automatically deploy like: servers, os, application, and configuration.
 Important: Configuration of Grafana - DATASOURCES, DASHBORD will be also implemented.
 
