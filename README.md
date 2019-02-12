@@ -4,6 +4,8 @@
 - Visualization of metrics using Grafana platforms
 - Showing the possibility of Prometheus in the *Hierarchical Federation* configuration
 
+Used tools: ***Vargrant, Ansible, Prometheus, Grafana, Mysql, node_exporter, mysql_exporter***
+
 ***
 
 **Use cases**
@@ -91,6 +93,9 @@ DataCenter: Global:
 ---
 **Configuration**
 
+All configuration files are in the repository - all of them will be automatically placed on the appropriate virtual machines.
+Below is the configuration for Vagrant as well as the sample files tasks.yaml for prometheus1.
+
 Vagrant file:
 
 ```# -*- mode: ruby -*-
@@ -168,7 +173,72 @@ end
 
 To automatic provision & deploy we are using ***ANSIBLE*** which is a radically simple IT automation engine that automates cloud provisioning, configuration management, application deployment, intra-service orchestration, and many other IT needs.
 
+roles/prometheus1/tasks/installation.yml:
 
+```
+---
+- name: Update system
+  yum:
+    name: '*'
+    state:  latest
+
+- name: Installation multiple packages
+  yum:
+    name: net-tools
+    state: present
+
+- name: Add Prometheus repositpory
+  yum_repository:
+    name: Prometheus
+    description: Prometheus repository
+    baseurl: https://packagecloud.io/prometheus-rpm/release/el/7/$basearch/
+    file: prometheus
+    gpgkey:
+     - https://packagecloud.io/prometheus-rpm/release/gpgkey
+     - https://raw.githubusercontent.com/lest/prometheus-rpm/master/RPM-GPG-KEY-prometheus-rpm
+    gpgcheck: yes
+    enabled: yes
+
+- name: Add Grafana repository
+  yum_repository:
+    name: grafana
+    description: Grafana repository
+    baseurl: https://packagecloud.io/grafana/stable/el/7/$basearch
+    file: grafana
+    gpgkey: https://packagecloud.io/gpg.key https://grafanarel.s3.amazonaws.com/RPM-GPG-KEY-grafana
+    gpgcheck: yes
+    enabled: yes
+    sslcacert: /etc/pki/tls/certs/ca-bundle.crt
+  notify: yum-clean-metadata
+
+- name: Installation Prometheus, Node_expoerter, Grafana
+  yum: 
+    name: 
+      - prometheus
+      - node_exporter
+      - grafana
+    state: present 
+
+- name: Inserting cofiguration for prometheus
+  blockinfile:
+    path: /etc/prometheus/prometheus.yml
+    block: "{{ lookup('file', 'prometheus') }}"
+    dest: "/etc/prometheus/prometheus.yml"
+    backup: yes
+       
+- name: Starting services Prometheus, node_exporter, grafana
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  with_items:
+    - 'prometheus'
+    - 'node_exporter'
+    - 'grafana-server'
+    ```
+    
+    
 
 ---
 **Data Flow:**
