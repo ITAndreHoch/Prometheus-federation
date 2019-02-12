@@ -239,7 +239,47 @@ roles/prometheus1/tasks/installation.yml:
     - 'grafana-server'
     
  ```
-    
+ 
+**Prometheus-federation/roles/prometheus1/tasks/configuration.yml:**
+
+```
+---
+- name: Grafana - copy DATASOURCE YAML 
+  copy:
+    src: datasource.yaml
+    dest: /etc/grafana/provisioning/datasources/datasource.yaml
+    owner: grafana
+    group: grafana
+    mode: 0640
+
+- name: Creating Grafana Dashboard Dir
+  file:
+    path: /var/lib/grafana/dashboards
+    state: directory
+    owner: grafana
+    group: grafana
+    mode: 0775
+ 
+- name: Grafana - dasboard Provisioning file
+  copy:
+    src: dashboardConfig.yaml
+    dest: /etc/grafana/provisioning/dashboards/dashboardConfig.yaml
+    owner: grafana
+    group: grafana
+    mode: 0640
+
+- name: Grafana - copy MySql dashbord JSON file 
+  copy:
+    src: mysql.json
+    dest: /var/lib/grafana/dashboards/dashboard.json
+    owner: grafana
+    group: grafana
+    mode: 0640
+  notify: reload-grafana
+
+```
+
+
 ***
     
 **Data Flow:**
