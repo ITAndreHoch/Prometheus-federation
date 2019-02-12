@@ -174,7 +174,7 @@ end
 
 To automatic provision & deploy we are using ***ANSIBLE*** which is a radically simple IT automation engine that automates cloud provisioning, configuration management, application deployment, intra-service orchestration, and many other IT needs.
 
-roles/prometheus1/tasks/installation.yml:
+**roles/prometheus1/tasks/installation.yml:**
 
 ```
 ---
