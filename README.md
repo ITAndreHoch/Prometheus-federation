@@ -90,7 +90,8 @@ DataCenter: Global:
 
 * Prometheus3-[192.168.50.25], Grafana-[192.168.50.25]
 
----
+***
+
 **Configuration**
 
 All configuration files are in the repository - all of them will be automatically placed on the appropriate virtual machines.
@@ -236,11 +237,11 @@ roles/prometheus1/tasks/installation.yml:
     - 'prometheus'
     - 'node_exporter'
     - 'grafana-server'
-    ```
     
+ ```
     
-
----
+***
+    
 **Data Flow:**
 
 The Prometheus1 and Prometheus2 servers scrapes targets
