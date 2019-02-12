@@ -18,6 +18,7 @@ Hierarchical federation allows Prometheus to scale to environments with tens of 
 
 For example, a setup might consist of many per-datacenter Prometheus servers that collect data in high detail (instance-level drill-down), and a set of global Prometheus servers which collect and store only aggregated data (job-level drill-down) from those local servers. This provides an aggregate global view and detailed local views.
 
+In our case we will use two Prometheus server - each one for another datacenter and one global to collect only specific type of metrics intended for senior managers - in our case - for analyzing the load on the databases -  comparison two environment - eg PROD and DEV
 
 
 ***
